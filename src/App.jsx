@@ -14,14 +14,16 @@ function App() {
 
   useEffect(() => {
     setListing('')
-    if (searchQuery || query.length < 0) searchCharacter();
+    const controller = new AbortController();
+    if (searchQuery || query.trim().length === 0) searchCharacter();
     async function searchCharacter() {
       setListing('')
       setLoading(true)
-      const data = await getCharacter(searchQuery)
+      const data = await getCharacter(searchQuery, controller.signal)
       setListing(data.results)
       setLoading(false)
     }
+    return controller.abort();
   }, [searchQuery])
 
   return (

@@ -1,9 +1,8 @@
-export async function getCharacter(value) {
-	const data = await fetch(
-		`https://rickandmortyapi.com/api/character/?name=${value}`
-	)
-	const response = await data.json()
-	if (response === undefined || response.error) {
+export async function getCharacter(value, signal) {
+	const response = await (await fetch(
+		`https://rickandmortyapi.com/api/character/?name=${value}`, signal 
+	)).json()
+	if (response === undefined || response.error || response.status === 404) {
 		throw new Error(`HTTP error! status: ${response.error}`);
 	}
 	return response
