@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChakraProvider, Heading, Text, Box, Button, SimpleGrid } from '@chakra-ui/react'
 import Inputfield from './components/input-field'
 import { useDebounce } from './hooks/useDebounce'
@@ -9,15 +9,17 @@ function App() {
   const [query, setQuery] = useState('')
   const [listing, setListing] = useState('')
   const [loading, setLoading] = useState(false)
+  const controllerRef = useRef()
 
   const searchQuery = useDebounce(query, 2000)
-  const controller = new AbortController()
-
-
+  const controller = new AbortController();
+  controllerRef.current = controller;
+  
   const searchCharacter = async () => {
     setListing('')
     setLoading(true)
-    const data = await getCharacter(searchQuery, controller.signal)
+    const data = await getCharacter(searchQuery, controllerRef.current?.signal)
+    controllerRef.current = null;
     setListing(data.results)
     setLoading(false)
   }
@@ -28,7 +30,7 @@ function App() {
   }, [searchQuery])
 
   const cancelSearch = () => {
-    controller.abort()
+    controllerRef.current.abort();
   }
 
   return (
