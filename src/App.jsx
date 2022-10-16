@@ -14,9 +14,8 @@ function App() {
 
   useEffect(() => {
     setListing('')
-    if (searchQuery) searchCharacter();
+    if (searchQuery || query.length < 0) searchCharacter();
     async function searchCharacter() {
-      if (query.length < 0) return
       setListing('')
       setLoading(true)
       const data = await getCharacter(searchQuery)
