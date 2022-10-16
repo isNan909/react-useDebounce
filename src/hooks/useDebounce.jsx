@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 export const useDebounce = (value, milliSeconds) => {
-	const [debouncedValue, setDebouncedValue] = useState(value);
+	const [debouncedValue, setDebouncedValue] = useState(value)
 	useEffect(() => {
 		const timer = setTimeout(() => setDebouncedValue(value), milliSeconds || 1000)
 
@@ -9,7 +9,7 @@ export const useDebounce = (value, milliSeconds) => {
 			clearTimeout(timer)
 		};
 
-	}, [value, milliSeconds]);
+	}, [value, milliSeconds])
 
-	return debouncedValue;
+	return debouncedValue
 };

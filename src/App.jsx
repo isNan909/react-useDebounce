@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChakraProvider, Heading, Text, Box } from '@chakra-ui/react'
+import { ChakraProvider, Heading, Text, Box, Button, SimpleGrid } from '@chakra-ui/react'
 import Inputfield from './components/input-field'
 import { useDebounce } from './hooks/useDebounce'
 import { getCharacter } from './utils/getCharacter'
@@ -11,20 +11,25 @@ function App() {
   const [loading, setLoading] = useState(false)
 
   const searchQuery = useDebounce(query, 2000)
+  const controller = new AbortController()
+
+
+  const searchCharacter = async () => {
+    setListing('')
+    setLoading(true)
+    const data = await getCharacter(searchQuery, controller.signal)
+    setListing(data.results)
+    setLoading(false)
+  }
 
   useEffect(() => {
-    setListing('')
-    const controller = new AbortController();
-    if (searchQuery || query.trim().length === 0) searchCharacter();
-    async function searchCharacter() {
-      setListing('')
-      setLoading(true)
-      const data = await getCharacter(searchQuery, controller.signal)
-      setListing(data.results)
-      setLoading(false)
-    }
-    return controller.abort();
+    if (searchQuery || query.trim().length < 0) searchCharacter()
+    return cancelSearch()
   }, [searchQuery])
+
+  const cancelSearch = () => {
+    controller.abort()
+  }
 
   return (
     <div className="App">
@@ -33,7 +38,13 @@ function App() {
         <Text fontSize='md' textAlign="left" mb={10}>
           With a debouce hook implemented
         </Text>
-        <Inputfield mb={10} onChange={(event) => setQuery(event.target.value)} value={query} />
+
+        <SimpleGrid columns={1} spacing={10}>
+          <Box>
+            <Inputfield mb={10} onChange={(event) => setQuery(event.target.value)} value={query} />
+          </Box>
+        </SimpleGrid>
+
         {loading && <Text mb={10} mt={10} textAlign="left">Loading...</Text>}
         {listing && <Box mt={10} display={'block'}>{listing.map(character => (
           <Box key={character.id} mb={10}>
@@ -41,6 +52,7 @@ function App() {
             {character.name}
           </Box>
         ))}</Box>}
+        {!listing && !loading && <Box mt={10} display={'block'} color={'#c8c8c8'}>You have started your search</Box>}
       </ChakraProvider>
     </div>
   )
